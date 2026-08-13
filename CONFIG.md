@@ -254,6 +254,16 @@ from scratch after Amendment D.
   (Google — third family, neutral to both graded vendors), same verbatim
   BrowseComp grader template, before any judging occurred. Key reused from
   the DRB2-20 series `.env`; validated 2026-08-13.
+- **Amendment G — Parallel sharding of Claude arms (scheduling only,
+  mid-generation).** The three Claude arms initially ran their 30 tasks
+  sequentially (~10+ min/task → 6–9 h wall-clock). Each arm was split into 3
+  concurrent shards over its remaining tasks (same config file, same prompt,
+  same per-task command — only scheduling changed; one completed task per
+  arm was kept, none re-run). Because sharded invocations write partial
+  response files, `scripts/rebuild_responses.py` reconstructs each system's
+  response file from the authoritative per-task attempt records under
+  `results/runs/`. No model, prompt, tool, retry, or timeout parameter
+  changed.
 - **Amendment F — Valyu credits disclosure (pre-main-run).** Valyu provided
   **$500 in API credits** for this benchmark, disclosed after the protocol
   freeze but before any main-table run. §9 updated accordingly. The Valyu
