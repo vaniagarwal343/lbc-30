@@ -198,15 +198,20 @@ before publishing.
 
 ## 9. Funding & conflict-of-interest disclosure
 
-**Exa provided $1,000 in API credits** supporting this benchmark series
-(shared with RB-30 and DRB2-20), and Exa is one of the compared search
-backends in this benchmark. No other provider contributed funding or credits;
-all other API usage is paid at list price by the authors. Exa had no input
-into task selection, agent/search configurations, prompts, judging, or any
-other design decision — the selection rule and all configs were frozen
-mechanically (§1–§5) before any run, and full run logs are published for
-independent verification. This disclosure must accompany any published
-version of the results table.
+Two of the compared search backends contributed API credits:
+
+- **Exa provided $1,000 in API credits** supporting this benchmark series
+  (shared with RB-30 and DRB2-20).
+- **Valyu provided $500 in API credits** supporting this benchmark
+  (disclosed 2026-08-13, before the main run; recorded in Amendment F).
+
+No other provider contributed funding or credits; all other API usage
+(Anthropic, OpenAI, Google) is paid at list price by the authors. Neither
+Exa nor Valyu had any input into task selection, agent/search
+configurations, prompts, judging, or any other design decision — the
+selection rule and all configs were frozen mechanically (§1–§5) before any
+run, and full run logs are published for independent verification. This
+disclosure must accompany any published version of the results table.
 
 ## 10. Amendment log (dated, pre-run/pre-judging amendments only)
 
@@ -249,3 +254,8 @@ from scratch after Amendment D.
   (Google — third family, neutral to both graded vendors), same verbatim
   BrowseComp grader template, before any judging occurred. Key reused from
   the DRB2-20 series `.env`; validated 2026-08-13.
+- **Amendment F — Valyu credits disclosure (pre-main-run).** Valyu provided
+  **$500 in API credits** for this benchmark, disclosed after the protocol
+  freeze but before any main-table run. §9 updated accordingly. The Valyu
+  configuration (server, tools, parameters) was frozen before the credits
+  were disclosed and is unchanged by them.

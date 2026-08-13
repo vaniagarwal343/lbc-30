@@ -67,6 +67,7 @@ agent-CLI × search-backend measurements.
 
 ## Funding disclosure
 
-**Exa provided $1,000 in API credits** supporting this benchmark series
-(shared with RB-30 and DRB2-20), and Exa is one of the compared search
-backends here. Exa had no input into any design decision; see `CONFIG.md` §9.
+**Exa provided $1,000 in API credits** (shared across this benchmark series
+with RB-30 and DRB2-20) and **Valyu provided $500 in API credits** for this
+benchmark — both are compared search backends here. Neither had input into
+any design decision; see `CONFIG.md` §9 and Amendment F.
