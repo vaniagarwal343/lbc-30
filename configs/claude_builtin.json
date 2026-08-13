@@ -1,0 +1,24 @@
+{
+  "system": "claude-builtin",
+  "agent": "claude",
+  "search": "builtin",
+  "model": "claude-sonnet-5",
+  "timeout_seconds": 1800,
+  "answer_extract": "claude_json",
+  "cmd": [
+    "claude",
+    "-p",
+    "{PROMPT}",
+    "--output-format",
+    "json",
+    "--model",
+    "claude-sonnet-5",
+    "--setting-sources",
+    "project",
+    "--strict-mcp-config",
+    "--allowed-tools",
+    "WebSearch,WebFetch",
+    "--disallowed-tools",
+    "Bash,Edit,Write,NotebookEdit,Task,TodoWrite"
+  ]
+}

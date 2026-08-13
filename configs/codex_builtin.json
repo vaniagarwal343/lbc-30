@@ -1,0 +1,32 @@
+{
+  "system": "codex-builtin",
+  "agent": "codex",
+  "search": "builtin",
+  "model": "gpt-5.6-terra",
+  "timeout_seconds": 1800,
+  "answer_extract": "last_message_file",
+  "last_message_file": "last_message.txt",
+  "extra_env": {
+    "CODEX_HOME": "{WORKDIR}/codex-home",
+    "CODEX_API_KEY": "{OPENAI_API_KEY}"
+  },
+  "setup_files": {
+    "codex-home/config.toml": "model = \"gpt-5.6-terra\"\napproval_policy = \"never\"\nsandbox_mode = \"read-only\"\nweb_search = \"live\"\n"
+  },
+  "cmd": [
+    "codex",
+    "exec",
+    "-m",
+    "gpt-5.6-terra",
+    "--sandbox",
+    "read-only",
+    "-c",
+    "approval_policy=\"never\"",
+    "--skip-git-repo-check",
+    "--cd",
+    "{WORKDIR}",
+    "-o",
+    "{WORKDIR}/last_message.txt",
+    "{PROMPT}"
+  ]
+}

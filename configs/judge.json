@@ -1,0 +1,6 @@
+{
+  "judge_model": "gemini-3.1-pro-preview",
+  "grader": "browsecomp-simple-evals-verbatim",
+  "rationale": "Vendor-neutral judge: graded agents are Anthropic (Claude Code) and OpenAI (Codex); a Google judge has no family self-preference conflict with either.",
+  "note": "Pre-judging availability check required; if this model is retired, substitute the closest current pinned Gemini model via dated CONFIG.md amendment before any judging."
+}

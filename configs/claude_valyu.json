@@ -1,0 +1,36 @@
+{
+  "system": "claude-valyu",
+  "agent": "claude",
+  "search": "valyu",
+  "model": "claude-sonnet-5",
+  "timeout_seconds": 1800,
+  "answer_extract": "claude_json",
+  "setup_files": {
+    "mcp.json": {
+      "mcpServers": {
+        "valyu": {
+          "type": "http",
+          "url": "https://mcp.valyu.ai/mcp?valyuApiKey={VALYU_API_KEY}"
+        }
+      }
+    }
+  },
+  "cmd": [
+    "claude",
+    "-p",
+    "{PROMPT}",
+    "--output-format",
+    "json",
+    "--model",
+    "claude-sonnet-5",
+    "--setting-sources",
+    "project",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{WORKDIR}/mcp.json",
+    "--allowed-tools",
+    "mcp__valyu",
+    "--disallowed-tools",
+    "WebSearch,WebFetch,Bash,Edit,Write,NotebookEdit,Task,TodoWrite"
+  ]
+}
