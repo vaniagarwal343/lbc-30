@@ -6,17 +6,22 @@ Judge: `gemini-3.1-pro-preview`, verbatim BrowseComp grader, blinded system IDs
 
 ## Headline accuracy
 
-| system | overall | DATED (15) | UNDATED (15) | Anthropic cost | notes |
+| system | overall | DATED (15) | UNDATED (15) | generation cost | notes |
 |---|---|---|---|---|---|
 | claude-exa | **60.0%** | 66.7% | 53.3% | $50.31 |  |
 | claude-builtin | **46.7%** | 46.7% | 46.7% | $120.06 | 1632 builtin searches |
-| codex-builtin | **46.7%** | 40.0% | 53.3% | — | 2,427,414 tok |
-| codex-exa | **40.0%** | 46.7% | 33.3% | — | 425 MCP calls; 1,958,866 tok |
+| codex-builtin | **46.7%** | 40.0% | 53.3% | ~$1–6 (est.) | 2,427,414 tok |
+| codex-exa | **40.0%** | 46.7% | 33.3% | ~$1–5 (est.) | 425 MCP calls; 1,958,866 tok |
 | claude-valyu | **26.7%** | 26.7% | 26.7% | $117.93 |  |
-| codex-valyu | **20.0%** | 33.3% | 6.7% | — | 858 MCP calls; 2,742,919 tok |
+| codex-valyu | **20.0%** | 33.3% | 6.7% | ~$1.5–7 (est.) | 858 MCP calls; 2,742,919 tok |
 
-Anthropic cost is generation-token + builtin-search billing for the Claude arms
-(Codex arms bill OpenAI; search calls bill Exa/Valyu — see CONFIG.md §6/§9).
+Claude arms: exact billed cost from Claude Code's per-run `total_cost_usd`
+(tokens + builtin-search fees, Anthropic-billed). Codex arms: Codex CLI reports
+only total tokens (no dollar figure and no input/cached/output split), so cost
+is **estimated** from `gpt-5.6-terra` list pricing ($2/$0.20/$12 per M
+input/cached/output, verified 2026-08-13) at blended effective rates of
+$0.50–2.50/M — exact figures are on the OpenAI billing dashboard. Search calls
+bill Exa/Valyu separately (pennies at their per-call rates; see CONFIG.md §6/§9).
 
 ## Per-task grid (✓ correct / ✗ incorrect)
 
