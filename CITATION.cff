@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this benchmark harness or its results, please cite it and the upstream LiveBrowseComp dataset."
+title: "LBC-30: coding-agent CLIs and search backends on LiveBrowseComp"
+authors:
+  - family-names: Agarwal
+    given-names: Vani
+date-released: 2026-08-13
+url: "https://github.com/vaniagarwal343/lbc-30"
+references:
+  - type: article
+    title: "LiveBrowseComp: Are Search Agents Searching, or Just Verifying What They Already Know?"
+    authors:
+      - family-names: Fan
+        given-names: HuiMing
+    year: 2026
+    url: "https://arxiv.org/abs/2605.28721"

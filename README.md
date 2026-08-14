@@ -11,7 +11,12 @@ facts), with each agent run under **three search backends**:
 2. **exa** — Exa's hosted MCP server (`web_search_exa`, `web_fetch_exa`), builtin search disabled
 3. **valyu** — Valyu's hosted MCP server, builtin search disabled
 
-Scored with the standard BrowseComp LLM grader under blinded system IDs.
+Scored with the standard BrowseComp LLM grader (vendor-neutral judge:
+`gemini-3.1-pro-preview`) under blinded system IDs.
+
+**📊 Headline: claude-exa 60.0% > claude-builtin = codex-builtin 46.7% >
+codex-exa 40.0% > claude-valyu 26.7% > codex-valyu 20.0%** — full tables in
+[RESULTS.md](RESULTS.md), insights and caveats in [ANALYSIS.md](ANALYSIS.md).
 Companion benchmarks: [RB-30](../rb-30) and DRB2-20 (same frozen-protocol
 discipline on deep-research endpoints).
 
