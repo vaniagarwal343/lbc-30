@@ -91,9 +91,13 @@ def call_gemini(model, prompt, max_retries=3):
 
 
 def parse_verdict(text):
-    correct = re.search(r"correct\s*:\s*(yes|no)", text, re.IGNORECASE)
+    # Judge output arrives either as the plain-text template ("correct: yes")
+    # or as fenced JSON ('"correct": "yes"'); accept both.
+    correct = re.search(
+        r"[\"'*]*correct[\"'*]*\s*:\s*[\"'*]*(yes|no)", text, re.IGNORECASE
+    )
     extracted = re.search(
-        r"extracted_final_answer\s*:\s*(.+)", text, re.IGNORECASE
+        r"[\"'*]*extracted_final_answer[\"'*]*\s*:\s*(.+)", text, re.IGNORECASE
     )
     return {
         "correct": (correct.group(1).lower() == "yes") if correct else None,

@@ -254,6 +254,14 @@ from scratch after Amendment D.
   (Google — third family, neutral to both graded vendors), same verbatim
   BrowseComp grader template, before any judging occurred. Key reused from
   the DRB2-20 series `.env`; validated 2026-08-13.
+- **Amendment H — Verdict-extraction fix (post-judging, pre-publication).**
+  The judge model returned verdicts in two formats: the grader template's
+  plain text ("correct: yes") and fenced JSON ('"correct": "yes"'). The
+  original parser only handled the former, leaving 14 of 180 verdicts
+  unparsed. Fix: `parse_verdict` broadened to accept both formats and all
+  180 **stored** raw judgements re-parsed uniformly — no judge call was
+  repeated, no verdict content changed, and the fix was applied to every
+  system identically before unblinding. Zero unparseable verdicts remain.
 - **Amendment G — Parallel sharding of Claude arms (scheduling only,
   mid-generation).** The three Claude arms initially ran their 30 tasks
   sequentially (~10+ min/task → 6–9 h wall-clock). Each arm was split into 3

@@ -1,0 +1,161 @@
+{
+  "summary": {
+    "judge_model": "gemini-3.1-pro-preview",
+    "n": 30,
+    "accuracy": 0.6,
+    "accuracy_recent": 0.6666666666666666,
+    "accuracy_older": 0.5333333333333333
+  },
+  "verdicts": [
+    {
+      "idx": 0,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 1,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 19,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 26,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 34,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 45,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 49,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 68,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 72,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 88,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 90,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 110,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 111,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 130,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 133,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 152,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 156,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 158,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 178,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 180,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 198,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 203,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 213,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 225,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 232,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 244,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 262,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 270,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 283,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 307,
+      "stratum": "older",
+      "correct": false
+    }
+  ]
+}

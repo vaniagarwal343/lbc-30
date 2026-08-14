@@ -1,0 +1,4 @@
+2.1.231 (Claude Code)
+codex-cli 0.147.0
+Thu Aug 13 14:08:22 PDT 2026
+note: Claude Code auto-updated 2.1.231 -> 2.1.232 mid-main-run (observed in process listings, 18:12); codex remained 0.147.0
