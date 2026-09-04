@@ -22,7 +22,7 @@
   "unset_env": [
     "ANTHROPIC_API_KEY"
   ],
-  "note": "Amendment I: model calls routed via OpenRouter; tool surface per Amendment J (configs/keenable_tools.json).",
+  "note": "Amendment I: model calls routed via OpenRouter. Amendment J: server exposes select, generate_html_report, revoke_html_report (configs/keenable_tools.json); only `select` (the search+fetch tool) is allowed.",
   "setup_files": {
     "mcp.json": {
       "mcpServers": {
@@ -50,7 +50,7 @@
     "--mcp-config",
     "{WORKDIR}/mcp.json",
     "--allowed-tools",
-    "mcp__keenable",
+    "mcp__keenable__select",
     "--disallowed-tools",
     "WebSearch,WebFetch,Bash,Edit,Write,NotebookEdit,Task,TodoWrite"
   ]

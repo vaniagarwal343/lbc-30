@@ -452,3 +452,17 @@ separate table and never pooled with the frozen 30.
 - These disclosures must accompany any published version of the extended
   results table, together with the transport and CLI-version differences in
   Amendment I.
+
+**Amendment J — recorded 2026-09-04, before the first Keenable task run.**
+`scripts/list_mcp_tools.py keenable` → `configs/keenable_tools.json`: the
+WebQL server ("Keenable SELECT" 0.1.0) exposes **3 tools**: `select` (one
+read-only SQL query in a DuckDB dialect with LLM semantic functions over
+web search results — the server's combined search + content-extraction
+tool), `generate_html_report` and `revoke_html_report` (publish / unpublish
+an HTML report; not search or fetch). Applying the rule above: the arms are
+allowed **`select` only** — Claude Code `--allowed-tools
+mcp__keenable__select`; Codex `enabled_tools = ["select"]` under
+`[mcp_servers.keenable]` (honouring verified in the pilot). Note for the
+trace analysis: a `select` "query" is SQL text embedding the search terms,
+so query-length and question-overlap stats for this arm are not directly
+comparable to the natural-language query arms and are reported separately.

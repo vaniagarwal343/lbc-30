@@ -59,6 +59,7 @@ SEARCH_TOOLS = {
     "valyu_company_research", "valyu_patents", "valyu_bio_search",
     "valyu_economics_search", "mcp__valyu__valyu_academic_search",
     "mcp__valyu__valyu_financial_search", "mcp__valyu__valyu_company_research",
+    "select", "mcp__keenable__select",  # Keenable WebQL: SQL over web search (Amendment J)
 }
 FETCH_TOOLS = {
     "WebFetch", "web_fetch_exa", "valyu_contents", "fetch",
