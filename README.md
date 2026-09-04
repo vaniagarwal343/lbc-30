@@ -17,6 +17,12 @@ Scored with the standard BrowseComp LLM grader (vendor-neutral judge:
 **📊 Headline: claude-exa 60.0% > claude-builtin = codex-builtin 46.7% >
 codex-exa 40.0% > claude-valyu 26.7% > codex-valyu 20.0%** — full tables in
 [RESULTS.md](RESULTS.md), insights and caveats in [ANALYSIS.md](ANALYSIS.md).
+
+**Extension in progress (frozen 2026-09-04, CONFIG.md §11):** two
+Keenable-WebQL arms (`claude-keenable`, `codex-keenable`, model calls routed
+via a vendor-supplied OpenRouter credit), a symmetric contamination flag on
+all tool trails, and a mechanically selected [held-out 15](HELDOUT.md) with
+transport-matched controls. Commands: [RUNBOOK_KEENABLE.md](RUNBOOK_KEENABLE.md).
 Companion benchmarks: [RB-30](../rb-30) and DRB2-20 (same frozen-protocol
 discipline on deep-research endpoints).
 

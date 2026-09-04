@@ -6,7 +6,14 @@ simple-evals (Wei et al., 2025). Judge model is fixed in configs/judge.json.
 
 Usage:
   python3 scripts/judge.py --responses results/responses/<blinded-id>.json \
-      [--tasks tasks/pilot_tasks.json] [--out results/judging/<blinded-id>.json]
+      [--tasks tasks/pilot_tasks.json] [--out results/judging/<blinded-id>.json] \
+      [--transport direct|openrouter]
+
+Transport (Amendment M): "direct" calls the Gemini API with GEMINI_API_TOKEN
+(the original 180 verdicts); "openrouter" sends the identical grader prompt
+to the same pinned Gemini model via OpenRouter chat completions
+(OPENROUTER_API_KEY), which the extension pass uses for all 240 + held-out
+verdicts. Default comes from configs/judge.json "transport".
 
 Input responses file: JSON array of {"idx": int, "response": str}.
 Output: per-task verdicts + accuracy summary (overall / recent / older).
@@ -18,8 +25,15 @@ import os
 import re
 import sys
 import time
+import ssl
 import urllib.request
 from pathlib import Path
+
+try:  # python.org builds lack system CA roots; use certifi when present
+    import certifi
+    SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    SSL_CTX = ssl.create_default_context()
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lbc_crypto import decrypt_string  # noqa: E402
@@ -80,7 +94,7 @@ def call_gemini(model, prompt, max_retries=3):
                     "Content-Type": "application/json",
                 },
             )
-            with urllib.request.urlopen(req, timeout=300) as resp:
+            with urllib.request.urlopen(req, timeout=300, context=SSL_CTX) as resp:
                 out = json.loads(resp.read())
             return out["candidates"][0]["content"]["parts"][0]["text"]
         except Exception as e:  # noqa: BLE001
@@ -88,6 +102,45 @@ def call_gemini(model, prompt, max_retries=3):
                 raise
             time.sleep(10 * (attempt + 1))
             print(f"  judge retry {attempt + 1}: {e}", file=sys.stderr)
+
+
+def call_openrouter(model, prompt, max_retries=3):
+    """Same grader prompt, same Gemini model, routed via OpenRouter."""
+    key = os.environ["OPENROUTER_API_KEY"]
+    body = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode()
+    for attempt in range(max_retries + 1):
+        try:
+            req = urllib.request.Request(
+                "https://openrouter.ai/api/v1/chat/completions",
+                data=body,
+                headers={
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://github.com/vaniagarwal343/lbc-30",
+                    "X-Title": "LBC-30 judge",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=300, context=SSL_CTX) as resp:
+                out = json.loads(resp.read())
+            if "error" in out:
+                raise RuntimeError(out["error"])
+            return out["choices"][0]["message"]["content"]
+        except Exception as e:  # noqa: BLE001
+            if attempt == max_retries:
+                raise
+            time.sleep(10 * (attempt + 1))
+            print(f"  judge retry {attempt + 1}: {e}", file=sys.stderr)
+
+
+def call_judge(transport, judge_cfg, prompt):
+    if transport == "direct":
+        return call_gemini(judge_cfg["judge_model"], prompt)
+    if transport == "openrouter":
+        return call_openrouter(judge_cfg["openrouter_model"], prompt)
+    raise ValueError(f"unknown transport {transport}")
 
 
 def parse_verdict(text):
@@ -111,11 +164,14 @@ def main():
     ap.add_argument("--responses", required=True)
     ap.add_argument("--tasks", default=str(ROOT / "tasks" / "selected_tasks.json"))
     ap.add_argument("--out", default=None)
+    ap.add_argument("--transport", choices=["direct", "openrouter"], default=None)
     args = ap.parse_args()
 
     load_env()
     judge_cfg = load_judge_config()
+    transport = args.transport or judge_cfg.get("transport", "direct")
     model = judge_cfg["judge_model"]
+    model_label = model if transport == "direct" else f"{judge_cfg['openrouter_model']} (via openrouter)"
 
     tasks = {
         t["idx"]: {
@@ -144,7 +200,7 @@ def main():
         prompt = GRADER_TEMPLATE.format(
             question=t["problem"], response=resp, correct_answer=t["answer"]
         )
-        v = parse_verdict(call_gemini(model, prompt))
+        v = parse_verdict(call_judge(transport, judge_cfg, prompt))
         v["idx"] = idx
         v["stratum"] = t["stratum"]
         verdicts.append(v)
@@ -154,7 +210,8 @@ def main():
         return sum(1 for v in vs if v["correct"]) / len(vs) if vs else None
 
     summary = {
-        "judge_model": model,
+        "judge_model": model_label,
+        "transport": transport,
         "n": len(verdicts),
         "accuracy": acc(verdicts),
         "accuracy_recent": acc([v for v in verdicts if v["stratum"] == "recent"]),

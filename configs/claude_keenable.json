@@ -1,0 +1,57 @@
+{
+  "system": "claude-keenable",
+  "agent": "claude",
+  "search": "keenable",
+  "model": "anthropic/claude-sonnet-5",
+  "transport": "openrouter",
+  "timeout_seconds": 1800,
+  "answer_extract": "claude_json",
+  "require_env": [
+    "OPENROUTER_API_KEY",
+    "KEENABLE_MCP_URL",
+    "KEENABLE_API_KEY"
+  ],
+  "extra_env": {
+    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+    "ANTHROPIC_AUTH_TOKEN": "{OPENROUTER_API_KEY}",
+    "ANTHROPIC_MODEL": "anthropic/claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "anthropic/claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "anthropic/claude-haiku-4.5",
+    "ANTHROPIC_SMALL_FAST_MODEL": "anthropic/claude-haiku-4.5"
+  },
+  "unset_env": [
+    "ANTHROPIC_API_KEY"
+  ],
+  "note": "Amendment I: model calls routed via OpenRouter; tool surface per Amendment J (configs/keenable_tools.json).",
+  "setup_files": {
+    "mcp.json": {
+      "mcpServers": {
+        "keenable": {
+          "type": "http",
+          "url": "{KEENABLE_MCP_URL}",
+          "headers": {
+            "X-API-Key": "{KEENABLE_API_KEY}"
+          }
+        }
+      }
+    }
+  },
+  "cmd": [
+    "claude",
+    "-p",
+    "{PROMPT}",
+    "--output-format",
+    "json",
+    "--model",
+    "anthropic/claude-sonnet-5",
+    "--setting-sources",
+    "project",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{WORKDIR}/mcp.json",
+    "--allowed-tools",
+    "mcp__keenable",
+    "--disallowed-tools",
+    "WebSearch,WebFetch,Bash,Edit,Write,NotebookEdit,Task,TodoWrite"
+  ]
+}

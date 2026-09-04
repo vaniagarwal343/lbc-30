@@ -277,3 +277,178 @@ from scratch after Amendment D.
   freeze but before any main-table run. §9 updated accordingly. The Valyu
   configuration (server, tools, parameters) was frozen before the credits
   were disclosed and is unchanged by them.
+
+---
+
+## 11. Extension: Keenable search-backend arms (amendments dated 2026-09-04)
+
+All amendments in this section were written and committed **before any
+extension run, tool listing excepted (Amendment J), and before any judging of
+extension outputs**. The original 180 runs and their published verdicts are
+untouched. Everything below follows the same freeze discipline as §1–§10:
+configs fixed in `configs/`, mechanical task rules in `scripts/`, blinding
+maps committed only after judging, no parameter changes after seeing results.
+
+### Amendment I — Keenable arms, model calls routed via OpenRouter (pre-run)
+
+Two new arms extend the main table: **claude-keenable** and
+**codex-keenable** — the same agent CLIs, prompt, timeouts, retry policy,
+sandbox settings, and tool-denial lists as the Exa arms, with Keenable's
+WebQL MCP server as the *only* tool.
+
+| | claude-keenable | codex-keenable |
+|---|---|---|
+| Agent CLI | Claude Code, headless `claude -p` | Codex CLI, `codex exec` |
+| Model (pinned) | `anthropic/claude-sonnet-5` | `openai/gpt-5.6-terra` |
+| Model transport | **OpenRouter** (`ANTHROPIC_BASE_URL=https://openrouter.ai/api`, `ANTHROPIC_AUTH_TOKEN`; `ANTHROPIC_API_KEY` unset) | **OpenRouter** (`[model_providers.openrouter]` in the per-run `CODEX_HOME` config: `base_url=https://openrouter.ai/api/v1`, `env_key=OPENROUTER_API_KEY`, `wire_api="responses"`; `CODEX_API_KEY`/`OPENAI_API_KEY` unset) |
+| Search | Keenable WebQL MCP (HTTP, `X-API-Key` header) | same |
+| Tools allowed | `mcp__keenable` only (tool surface: Amendment J) | MCP only, `web_search="disabled"` |
+| Config file | `configs/claude_keenable.json` | `configs/codex_keenable.json` |
+
+Fixed in advance:
+
+- **Why OpenRouter.** The vendor (Keenable) supplied a $250 OpenRouter credit
+  for the extension's model calls, plus the WebQL API key (see §9 update
+  below). Routing through OpenRouter is a **transport difference** from the
+  original six arms, which called Anthropic/OpenAI directly. This is a known
+  confound and is disclosed with every published number; it is bounded by
+  the held-out controls in Amendment L, which run the *original* claude-exa
+  and claude-builtin configurations through OpenRouter as well
+  (`configs/claude_exa_or.json`, `configs/claude_builtin_or.json`, identical
+  to the originals except transport).
+- **Model IDs** are the OpenRouter names of the same pinned models
+  (`anthropic/claude-sonnet-5`, `openai/gpt-5.6-terra`). Claude Code's
+  background/helper model is mapped to `anthropic/claude-haiku-4.5` so no
+  request can fall through to a non-OpenRouter route; resolved model IDs are
+  recorded per run from CLI metadata as before. Claude Code's self-reported
+  `total_cost_usd` uses its own price table and is **not** the OpenRouter
+  charge; OpenRouter's activity page is the cost source for these arms.
+- **CLI versions.** The original run used Claude Code 2.1.231→2.1.232 and
+  Codex 0.147.0. Claude Code cannot be pinned to 2.1.231 on this machine
+  without replacing the user's install, so the extension **records** the
+  current build instead (2.1.261 at freeze; Codex still 0.147.0). The
+  harness now writes `cli_version` into every attempt record. The version
+  gap is a second disclosed difference between the original and extension
+  arms, also bounded by the Amendment L controls.
+- **Hermeticity unchanged.** The OpenRouter provider block lives in the
+  per-run generated `config.toml` (§2.2), not in `~/.codex/config.toml`; the
+  Claude arm still uses `--setting-sources project --strict-mcp-config` in
+  an empty temp dir. `unset_env` in the config guarantees no vendor key is
+  visible to the subprocess.
+- **Sanity check before any task run:** `scripts/sanity_openrouter.sh` sends
+  one trivial no-tool prompt through each CLI with the OpenRouter env and
+  the operator confirms both calls on the OpenRouter activity page (and
+  that no charge lands on the Anthropic/OpenAI accounts). Then one pilot
+  task (idx 2, §8) per Keenable arm end-to-end. Pilot results never enter
+  headline tables.
+- **Baseten endpoint excluded.** Keenable's Baseten-hosted endpoint is a
+  different harness (not a search backend inside an agent CLI) and is not an
+  LBC-30 arm. It is reserved for the deep-research benchmarks (RB-30 /
+  DRB2-20).
+- **Runs:** 2 arms × 30 tasks = 60 main runs, one per task, same §2.3 retry
+  policy. Raw transcripts and per-task tool-call trails are archived locally
+  (`scripts/archive_traces.py`) for the trace analysis, never committed.
+
+### Amendment J — Keenable tool surface (pre-run, recorded before the first task)
+
+Before any Keenable run, `scripts/list_mcp_tools.py keenable` lists the
+tools the WebQL server exposes and commits the list as
+`configs/keenable_tools.json` (names, descriptions, input keys). The
+**decision rule is fixed now**, before the list is seen:
+
+> The Keenable arms get the **same tool surface as the Exa arms: one search
+> tool and one fetch/contents tool.** If the server exposes exactly those
+> two, all tools are allowed. If it exposes more, the allowlist is narrowed
+> to the search- and fetch-equivalent tools only — on Claude Code via
+> `--allowed-tools mcp__keenable__<search>,mcp__keenable__<fetch>`, on Codex
+> via the server's `enabled_tools` config key if Codex 0.147.0 honours it;
+> if Codex cannot restrict per-tool, the Codex arm receives the full set
+> (as the Valyu arms did) and that asymmetry is recorded here.
+
+The chosen tool names are appended to this amendment as a dated line before
+the first main-table run. The trace analysis records every tool name each
+arm actually invoked.
+
+### Amendment K — Contamination flag on tool trails (analysis, symmetric)
+
+`scripts/analyze_traces.py` now marks a task **contaminated** for an arm if
+any URL in that run's tool trail — search/fetch *inputs* or tool *results*,
+including Codex builtin search output — matches a leak pattern:
+
+```
+huggingface.co/datasets/Forival/LiveBrowseComp     (upstream dataset)
+arxiv.org/(abs|pdf|html)/2605.28721                (upstream paper)
+github.com/vaniagarwal343/lbc-30                   (this repo)
+"livebrowsecomp" anywhere in a URL                 (mirrors / leaderboards)
+"2605.28721" anywhere in a URL
+```
+
+The pass runs identically over every arm (original six + Keenable + held-out
+controls). Both **raw** accuracy and **contamination-excluded** accuracy
+(contaminated tasks removed from numerator and denominator, denominator
+published) are reported. Additional leak domains may only be added by a
+further dated amendment applied to all arms at once.
+
+Result on the original 180 trails (run 2026-09-04, before any extension
+run): **0 contaminated tasks in all six arms**; raw = excluded for every
+published number.
+
+### Amendment L — Held-out slice of 15 (pre-run)
+
+To test whether the frozen-30 ordering generalises, a held-out slice is
+selected mechanically from the 302 upstream tasks never used (not in the
+frozen 30, not in the pilot) — rule in `scripts/select_heldout.py`, list and
+hashes in `HELDOUT.md` / `tasks/heldout_tasks.json`, committed before any
+held-out run:
+
+> Same regex strata as §1; within each stratum sort by idx and take evenly
+> strided picks, **8 DATED + 7 UNDATED** (15 is odd; the smaller stratum
+> gets the extra pick).
+
+Frozen held-out idx list: **4, 12, 39, 55, 82, 102, 116, 146, 154, 193, 197,
+219, 248, 279, 292** (DATED: 12, 39, 55, 82, 116, 146, 154, 219 — UNDATED:
+4, 102, 193, 197, 248, 279, 292).
+
+Systems run on the slice (all model calls via OpenRouter, so the comparison
+is transport-matched): **claude-exa-or**, **claude-builtin-or**,
+**claude-keenable** — 45 runs. Codex arms are optional and, if run, use the
+same rule. Outputs go to a separate tree, `results/heldout/`, with its own
+blinding map and judging directory; held-out numbers are reported in a
+separate table and never pooled with the frozen 30.
+
+### Amendment M — Blinding extension and judge transport (pre-judging)
+
+- **Blinding.** `scripts/blind_responses.py` now extends an existing map:
+  the original assignments (sys-a…sys-f) are preserved and the two Keenable
+  arms receive **sys-g / sys-h in crypto-random order**. The extended map is
+  committed only after all extension judging is complete. The held-out tree
+  gets an independent map.
+- **Judge transport.** The judge model stays `gemini-3.1-pro-preview` with
+  the verbatim BrowseComp grader and the Amendment H verdict parser. For the
+  extension pass the identical prompt is sent to the same model **via
+  OpenRouter** (`google/gemini-3.1-pro-preview`, `configs/judge.json`
+  `transport="openrouter"`), so the extension's judging is also covered by
+  the vendor credit. Pre-judging availability check as in §5.
+- **Drift check.** In the same pass the original 180 blinded responses
+  (sys-a…sys-f) are **re-judged** through OpenRouter and diffed against the
+  published verdicts with `scripts/judge_drift.py`. Rule fixed now: the
+  **published headline for the original six arms remains the original
+  direct-transport verdicts**; the re-judge is reported as an agreement rate
+  and flip list (per arm, by idx). If agreement is 100% the extension is
+  effectively one judge run over all 240; if not, the drift count is
+  published alongside the Keenable numbers, and no verdict is hand-adjusted.
+
+### §9 update — Keenable funding and access disclosure (2026-09-04)
+
+- **Keenable provided a $250 OpenRouter credit** that pays for the model
+  calls of the two Keenable arms, the held-out slice (including the
+  claude-exa-or / claude-builtin-or controls), and the extension judging
+  pass; Keenable also provided the WebQL API key used by the arms.
+- Because the WebQL calls carry the benchmark queries, **the vendor can
+  observe the queries after the run**. Task selection was frozen and public
+  before the vendor was involved; the vendor had no input into
+  configurations, prompts, judging, or the tool-surface rule (Amendment J),
+  all of which were committed before the first Keenable run.
+- These disclosures must accompany any published version of the extended
+  results table, together with the transport and CLI-version differences in
+  Amendment I.

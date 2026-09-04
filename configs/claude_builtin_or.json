@@ -1,0 +1,40 @@
+{
+  "system": "claude-builtin-or",
+  "agent": "claude",
+  "search": "builtin",
+  "model": "anthropic/claude-sonnet-5",
+  "transport": "openrouter",
+  "timeout_seconds": 1800,
+  "answer_extract": "claude_json",
+  "require_env": [
+    "OPENROUTER_API_KEY"
+  ],
+  "extra_env": {
+    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+    "ANTHROPIC_AUTH_TOKEN": "{OPENROUTER_API_KEY}",
+    "ANTHROPIC_MODEL": "anthropic/claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "anthropic/claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "anthropic/claude-haiku-4.5",
+    "ANTHROPIC_SMALL_FAST_MODEL": "anthropic/claude-haiku-4.5"
+  },
+  "unset_env": [
+    "ANTHROPIC_API_KEY"
+  ],
+  "note": "Held-out control (Amendment L): identical to claude_builtin.json except model calls routed via OpenRouter.",
+  "cmd": [
+    "claude",
+    "-p",
+    "{PROMPT}",
+    "--output-format",
+    "json",
+    "--model",
+    "anthropic/claude-sonnet-5",
+    "--setting-sources",
+    "project",
+    "--strict-mcp-config",
+    "--allowed-tools",
+    "WebSearch,WebFetch",
+    "--disallowed-tools",
+    "Bash,Edit,Write,NotebookEdit,Task,TodoWrite"
+  ]
+}

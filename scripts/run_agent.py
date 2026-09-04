@@ -84,7 +84,20 @@ def extract_final(cfg, stdout_text, workdir):
     raise ValueError(f"unknown answer_extract mode: {mode}")
 
 
-SECRET_VARS = ["EXA_API_KEY", "VALYU_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
+SECRET_VARS = ["EXA_API_KEY", "VALYU_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+               "OPENROUTER_API_KEY", "KEENABLE_API_KEY"]
+# Non-secret substitutions that configs may reference (Amendment I).
+CONFIG_VARS = SECRET_VARS + ["KEENABLE_MCP_URL"]
+
+
+def cli_version(agent):
+    """Record the exact CLI build per attempt (Claude Code auto-updates)."""
+    try:
+        out = subprocess.run([agent, "--version"], capture_output=True,
+                             text=True, timeout=30).stdout.strip()
+        return out.splitlines()[0] if out else None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def redact(text):
@@ -95,16 +108,15 @@ def redact(text):
     return text
 
 
-def run_once(cfg, prompt, run_dir, attempt):
+def run_once(cfg, prompt, run_dir, attempt):  # noqa: C901
     workdir = tempfile.mkdtemp(prefix="lbc-run-")
-    mapping = {
-        "PROMPT": prompt,
-        "WORKDIR": workdir,
-        "EXA_API_KEY": os.environ.get("EXA_API_KEY", ""),
-        "VALYU_API_KEY": os.environ.get("VALYU_API_KEY", ""),
-        "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
-        "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", ""),
-    }
+    mapping = {"PROMPT": prompt, "WORKDIR": workdir}
+    for var in CONFIG_VARS:
+        mapping[var] = os.environ.get(var, "")
+    for var in cfg.get("require_env", []):
+        if not mapping.get(var):
+            raise SystemExit(f"[harness] {var} is required by {cfg['system']} "
+                             f"but empty/missing in .env")
     setup_files = expand(cfg.get("setup_files", {}), mapping)
     for rel, content in setup_files.items():
         p = Path(workdir) / rel
@@ -115,6 +127,9 @@ def run_once(cfg, prompt, run_dir, attempt):
     cmd = expand(cfg["cmd"], mapping)
     env = os.environ.copy()
     env.update(expand(cfg.get("extra_env", {}), mapping))
+    # Amendment I: OpenRouter-routed arms must not fall back to vendor keys.
+    for var in cfg.get("unset_env", []):
+        env.pop(var, None)
 
     started = time.time()
     try:
@@ -144,6 +159,9 @@ def run_once(cfg, prompt, run_dir, attempt):
 
     record = {
         "attempt": attempt,
+        "cli_version": cli_version(cfg["agent"]),
+        "transport": cfg.get("transport", "direct"),
+        "workdir": workdir,
         "cmd": [redact(c if len(c) < 2000 else c[:2000] + "...<truncated>") for c in cmd],
         "returncode": rc,
         "timed_out": timed_out,
@@ -164,7 +182,11 @@ def main():
     ap.add_argument("--config", required=True)
     ap.add_argument("--tasks", default=str(ROOT / "tasks" / "selected_tasks.json"))
     ap.add_argument("--only", default=None, help="comma-separated idx filter")
+    ap.add_argument("--out-root", default=str(ROOT / "results"),
+                    help="results tree (default results/; held-out slice uses "
+                         "results/heldout per Amendment L)")
     args = ap.parse_args()
+    out_root = Path(args.out_root)
 
     load_env()
     cfg = json.loads(Path(args.config).read_text())
@@ -177,7 +199,7 @@ def main():
     responses = []
     for t in tasks:
         idx = t["idx"]
-        run_dir = ROOT / "results" / "runs" / system / f"idx_{idx:03d}"
+        run_dir = out_root / "runs" / system / f"idx_{idx:03d}"
         run_dir.mkdir(parents=True, exist_ok=True)
         prompt = PROMPT_TEMPLATE.format(
             problem=decrypt_string(t["problem_encrypted"])
@@ -196,7 +218,7 @@ def main():
               f"({rec['elapsed_seconds']}s, attempt {rec['attempt']})")
         responses.append({"idx": idx, "response": final})
 
-    out_path = ROOT / "results" / "responses" / f"{system}.json"
+    out_path = out_root / "responses" / f"{system}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(responses, indent=2, ensure_ascii=False) + "\n")
     n_ok = sum(1 for r in responses if r["response"].strip())
