@@ -466,3 +466,15 @@ mcp__keenable__select`; Codex `enabled_tools = ["select"]` under
 trace analysis: a `select` "query" is SQL text embedding the search terms,
 so query-length and question-overlap stats for this arm are not directly
 comparable to the natural-language query arms and are reported separately.
+
+**Harness incident — 2026-09-04 15:39–16:33 PDT (recorded during the
+extension main run).** The laptop entered clamshell sleep (lid closed;
+`caffeinate` does not prevent this) with all seven extension workers in
+flight. Processes were frozen, not killed: on wake every worker resumed and
+its in-flight task completed normally (Codex immediately, Claude Code once
+its HTTP streams reconnected). Consequences: `elapsed_seconds` for the tasks
+that spanned the sleep includes ~55 min of wall-clock pause and is not a
+latency measurement; the harness per-attempt timeout (monotonic clock) did
+not consume the paused time, so no spurious timeouts fired. No run was
+killed, re-run, or altered. Affected task ids are identifiable from attempt
+records with `elapsed_seconds > 1800`.
