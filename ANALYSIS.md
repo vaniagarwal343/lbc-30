@@ -65,3 +65,88 @@ agentic CLIs.
 - Codex at explicit higher reasoning effort as a new frozen config.
 - A valyu run pinned to `valyu_search`+`valyu_contents` only, to test whether
   the 11-tool surface (vertical searches) diluted tool choice.
+
+---
+
+# Extension: Keenable WebQL arms (2026-09-04)
+
+Tables: [RESULTS.md § Extension](RESULTS.md#extension-2026-09-04-keenable-webql-arms-contamination-flag-held-out-slice) · protocol: CONFIG.md §11.
+
+## Findings
+
+1. **Keenable lands in the builtin tier on the frozen 30, not the Exa tier.**
+   codex-keenable ties the two builtin arms at 46.7%; claude-keenable is
+   43.3% counting its three failed runs as wrong (48.1% on the 27 tasks it
+   finished). Both sit well above the Valyu arms (20–27%) and well below
+   claude-exa (60%). Backend rank order for Claude is now
+   exa > builtin > keenable > valyu; for Codex, builtin = keenable > exa >
+   valyu — Keenable is the first backend where the *Codex* arm matches or
+   beats the Claude arm.
+2. **The failure mode on Claude is non-termination, not wrong answers.** Three
+   tasks (idx 49, 156, 307) burned 3 × 30 minutes each without a final
+   answer: the agent kept issuing `select` queries (60–140 per attempt) and
+   never committed. No other arm in the benchmark has a failed run. Unsolved
+   claude-keenable tasks median 47 `select` calls vs 17 for solved ones — the
+   same "keep searching" signature that characterised the Valyu arms, at a
+   higher accuracy ceiling. A single combined search+extract tool that
+   returns tabular result sets appears to invite open-ended query
+   refinement on Claude Code; Codex, which is stingier with tool calls
+   (9.7/task vs 49.9), was unaffected.
+3. **Transport-matched held-out slice reverses the Claude ordering.** On 15
+   tasks no arm had seen, with all three Claude arms routed through
+   OpenRouter on the same CLI build, claude-keenable scored 53.3% (57.1%
+   with the one contamination-flagged task excluded) vs claude-exa-or 40.0%
+   and claude-builtin-or 33.3%. The two controls also fell 20 and 13 points
+   below their frozen-30 originals. Two readings are consistent with the
+   data and cannot be separated at n = 15: (a) the held-out tasks are harder
+   for Exa/builtin and Keenable genuinely generalises better, or (b) the
+   frozen 30 happen to favour Exa. A one-task swing is 6.7 points, so the
+   honest statement is: *the frozen-30 ordering does not reproduce on the
+   held-out slice*, and a larger transport-matched replication is the next
+   step before ranking Keenable against Exa either way.
+4. **Cost.** claude-keenable's frozen-30 run cost $44 including ten
+   timed-out attempts (roughly $1.20/task on completed tasks) — cheaper than
+   builtin ($120) and Valyu ($118), comparable to Exa ($50). On the held-out
+   slice it was the cheapest Claude arm ($15.6 vs $14.8 Exa vs $70.7
+   builtin). Search itself was free under Keenable's 100k-requests/month
+   tier.
+5. **Judge stability.** Re-judging the original 180 through OpenRouter
+   reproduced 177 verdicts; the 3 flips (two on idx 133) moved claude-exa
+   −3.3 and claude-valyu +6.7 points, not enough to reorder anything. The
+   BrowseComp grader with this judge is stable to within one or two tasks per
+   arm across transports.
+6. **Contamination.** Zero flagged tasks across all 240 frozen-30 trails.
+   The one held-out flag (claude-keenable idx 55) was a search result set
+   listing the paper and dataset pages, never fetched, on a task judged
+   incorrect anyway — no evidence any arm's score benefited from leaked
+   material.
+
+## Caveats specific to the extension
+
+- **Two disclosed confounds vs the original six arms:** model calls via
+  OpenRouter rather than Anthropic/OpenAI directly, and Claude Code 2.1.261
+  vs 2.1.231–232. The held-out controls bound these for the Claude side only;
+  codex-keenable has no transport-matched Codex control (optional per
+  Amendment L, not run).
+- **Vendor involvement:** Keenable paid for the extension's model calls and
+  judging via a $250 OpenRouter credit and supplied the WebQL key; it can
+  observe the benchmark queries after the fact. It had no input into task
+  selection, configs, prompts, tool-surface rule, or judging, all frozen and
+  committed before its arms ran (CONFIG.md §9 update).
+- **Tool surface.** Keenable's server exposes `select` plus two HTML-report
+  tools; the arms received `select` only under the pre-committed
+  "search + fetch equivalents" rule (Amendment J). This is the narrowest
+  surface in the benchmark (Exa: 2 tools; Valyu: full set).
+- **A 55-minute laptop sleep** paused all workers mid-run (CONFIG.md §11
+  incident note). No run was killed or altered; wall-clock latencies for
+  the tasks that spanned it are not meaningful.
+
+## What we'd run next
+
+- A **transport-matched replication of claude-exa on the frozen 30**
+  (claude-exa-or, 30 runs, ~$30) to settle whether the 60% headline survives
+  OpenRouter routing and the newer CLI — the cheapest way to resolve finding 3.
+- **Held-out to 30+ tasks** for the three Claude arms, so a one-task swing is
+  under 3.5 points.
+- **codex-exa-or / codex-builtin-or** on the held-out slice to give
+  codex-keenable a matched control.

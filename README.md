@@ -18,11 +18,16 @@ Scored with the standard BrowseComp LLM grader (vendor-neutral judge:
 codex-exa 40.0% > claude-valyu 26.7% > codex-valyu 20.0%** — full tables in
 [RESULTS.md](RESULTS.md), insights and caveats in [ANALYSIS.md](ANALYSIS.md).
 
-**Extension in progress (frozen 2026-09-04, CONFIG.md §11):** two
-Keenable-WebQL arms (`claude-keenable`, `codex-keenable`, model calls routed
-via a vendor-supplied OpenRouter credit), a symmetric contamination flag on
-all tool trails, and a mechanically selected [held-out 15](HELDOUT.md) with
-transport-matched controls. Commands: [RUNBOOK_KEENABLE.md](RUNBOOK_KEENABLE.md).
+**Extension (2026-09-04, CONFIG.md §11):** two Keenable-WebQL arms —
+**codex-keenable 46.7%**, **claude-keenable 43.3%** (3 failed runs) on the
+frozen 30, model calls routed via a vendor-supplied OpenRouter credit; a
+symmetric contamination flag (0 hits on all 240 frozen-30 trails); and a
+[held-out 15](HELDOUT.md) with transport-matched controls where
+claude-keenable 53.3% > claude-exa-or 40.0% > claude-builtin-or 33.3%
+(n = 15, suggestive only). Judge re-run drift: 3/180. Details in
+[RESULTS.md](RESULTS.md#extension-2026-09-04-keenable-webql-arms-contamination-flag-held-out-slice)
+and [ANALYSIS.md](ANALYSIS.md#extension-keenable-webql-arms-2026-09-04);
+commands in [RUNBOOK_KEENABLE.md](RUNBOOK_KEENABLE.md).
 Companion benchmarks: [RB-30](../rb-30) and DRB2-20 (same frozen-protocol
 discipline on deep-research endpoints).
 
