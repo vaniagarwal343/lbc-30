@@ -1,0 +1,5 @@
+{
+  "claude-builtin-or": "sys-a",
+  "claude-exa-or": "sys-b",
+  "claude-keenable": "sys-c"
+}

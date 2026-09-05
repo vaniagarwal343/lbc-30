@@ -1,0 +1,79 @@
+{
+  "a": "results/judging_main",
+  "b": "results/judging_rejudge",
+  "n_compared": 180,
+  "n_flips": 3,
+  "agreement": 0.9833,
+  "per_system": {
+    "sys-a": {
+      "system": "claude-builtin",
+      "n": 30,
+      "flips": 0,
+      "flipped_idx": [],
+      "yes_to_no": [],
+      "no_to_yes": [],
+      "accuracy_a": 0.4666666666666667,
+      "accuracy_b": 0.4666666666666667
+    },
+    "sys-b": {
+      "system": "codex-valyu",
+      "n": 30,
+      "flips": 0,
+      "flipped_idx": [],
+      "yes_to_no": [],
+      "no_to_yes": [],
+      "accuracy_a": 0.2,
+      "accuracy_b": 0.2
+    },
+    "sys-c": {
+      "system": "codex-exa",
+      "n": 30,
+      "flips": 0,
+      "flipped_idx": [],
+      "yes_to_no": [],
+      "no_to_yes": [],
+      "accuracy_a": 0.4,
+      "accuracy_b": 0.4
+    },
+    "sys-d": {
+      "system": "claude-exa",
+      "n": 30,
+      "flips": 1,
+      "flipped_idx": [
+        133
+      ],
+      "yes_to_no": [
+        133
+      ],
+      "no_to_yes": [],
+      "accuracy_a": 0.6,
+      "accuracy_b": 0.5666666666666667
+    },
+    "sys-e": {
+      "system": "claude-valyu",
+      "n": 30,
+      "flips": 2,
+      "flipped_idx": [
+        34,
+        133
+      ],
+      "yes_to_no": [],
+      "no_to_yes": [
+        34,
+        133
+      ],
+      "accuracy_a": 0.26666666666666666,
+      "accuracy_b": 0.3333333333333333
+    },
+    "sys-f": {
+      "system": "codex-builtin",
+      "n": 30,
+      "flips": 0,
+      "flipped_idx": [],
+      "yes_to_no": [],
+      "no_to_yes": [],
+      "accuracy_a": 0.4666666666666667,
+      "accuracy_b": 0.4666666666666667
+    }
+  }
+}

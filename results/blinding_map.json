@@ -1,8 +1,10 @@
 {
   "claude-builtin": "sys-a",
   "claude-exa": "sys-d",
+  "claude-keenable": "sys-g",
   "claude-valyu": "sys-e",
   "codex-builtin": "sys-f",
   "codex-exa": "sys-c",
+  "codex-keenable": "sys-h",
   "codex-valyu": "sys-b"
 }

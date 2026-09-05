@@ -1,0 +1,86 @@
+{
+  "summary": {
+    "judge_model": "google/gemini-3.1-pro-preview (via openrouter)",
+    "n": 15,
+    "accuracy": 0.4,
+    "accuracy_recent": 0.375,
+    "accuracy_older": 0.42857142857142855
+  },
+  "verdicts": [
+    {
+      "idx": 4,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 12,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 39,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 55,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 82,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 102,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 116,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 146,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 154,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 193,
+      "stratum": "recent",
+      "correct": true
+    },
+    {
+      "idx": 197,
+      "stratum": "older",
+      "correct": false
+    },
+    {
+      "idx": 219,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 248,
+      "stratum": "older",
+      "correct": true
+    },
+    {
+      "idx": 279,
+      "stratum": "recent",
+      "correct": false
+    },
+    {
+      "idx": 292,
+      "stratum": "older",
+      "correct": true
+    }
+  ]
+}

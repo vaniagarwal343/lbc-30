@@ -60,8 +60,17 @@ def main():
             copied = 0
             if system.startswith("claude"):
                 sid = (rec.get("meta") or {}).get("session_id")
+                srcs = glob.glob(str(CLAUDE_PROJECTS / "*" / f"{sid}.jsonl")) if sid else []
+                if not srcs and wd:
+                    # timed-out attempts have no JSON result (no session_id):
+                    # fall back to the project dir named after the workdir
+                    slug = Path(wd).name.replace("_", "-")  # Claude Code slugs "_" as "-"
+                    srcs = [f for f in glob.glob(str(CLAUDE_PROJECTS / f"*{slug}" / "*.jsonl"))]
+                    srcs = sorted(srcs, key=lambda f: Path(f).stat().st_size, reverse=True)[:1]
+                    if srcs:
+                        sid = Path(srcs[0]).stem
                 row["claude_session_id"] = sid
-                for src in glob.glob(str(CLAUDE_PROJECTS / "*" / f"{sid}.jsonl")) if sid else []:
+                for src in srcs:
                     dst = traces / "claude" / Path(src).parent.name / Path(src).name
                     dst.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(src, dst)
